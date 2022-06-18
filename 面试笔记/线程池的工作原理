@@ -1,0 +1,81 @@
+一、线程池工作原理
+		
+	首先我们看下当一个新的任务提交到线程池之后，线程池是如何处理的
+
+	1.判断核心线程数是否已满，核心线程数大小和corePoolSize参数有关，未满则创建线程执行任务
+
+	2.若核心线程池已满，判断队列是否满，队列是否满和workQueue参数有关，若未满则加入队列中
+
+	3.若队列已满，判断线程池是否已满，线程池是否已满和maximumPoolSize参数有关，若未满创建线程执行任务
+
+	4.若线程池已满，则采用拒绝策略处理无法执执行的任务，拒绝策略和handler参数有关
+
+二、使用线程池的优点
+	
+	1、降低资源消耗，可以重复利用已创建的线程降低线程创建和销毁造成的消耗。
+
+	2、提高响应速度，当任务到达时，任务可以不需要等到线程创建就能立即执行。
+
+    3、提高线程的可管理性，线程是稀缺资源，如果无限制地创建，不仅会消耗系统资源，还会降低系统的稳定性，使用线程池可以进行统一分配、调优和监控
+
+三、线程池的创建
+
+	创建线程池主要是【ThreadPoolExecutor】类来完成,ThreadPoolExecutor的有许多重载的构造方法,通过参数最多的构造方法来理解创建线程池有哪些需要配置的参数。ThreadPoolExecutor 的构造方法为：
+
+	ThreadPoolExecutor(int corePoolSize,
+                              int maximumPoolSize,
+                              long keepAliveTime,
+                              TimeUnit unit,
+                              BlockingQueue<Runnable> workQueue,
+                              ThreadFactory threadFactory,
+                              RejectedExecutionHandler handler)
+
+    面对参数进行说明：
+
+		corePoolSize：表示核心线程池的大小。当提交一个任务时，如果当前核心线程池的线程个数没有达到 corePoolSize，则会创建新的线程来执行所提交的任务，即使当前核心线程池有空闲的线程。如果当前核心线程池的线程个数已经达到了
+
+		corePoolSize，则不再重新创建线程。如果调用了prestartCoreThread()或者prestartAllCoreThreads()，线程池创建的时候所有的核心线程都会被创建并且启动。
+
+		maximumPoolSize：表示线程池能创建线程的最大个数。如果当阻塞队列已满时，并且当前线程池线程个数没有超过 maximumPoolSize 的话，就会创建新的线程来执行任务。
+
+		keepAliveTime：空闲线程存活时间。如果当前线程池的线程个数已经超过了 corePoolSize，并且线程空闲时间超过了 keepAliveTime 的话，就会将这些空闲线程销毁，这样可以尽可能降低系统资源消耗。
+
+		unit：时间单位。为 keepAliveTime 指定时间单位。
+
+		workQueue：阻塞队列。用于保存任务的阻塞队列，关于阻塞队列可以看这篇文章。可以使用ArrayBlockingQueue, LinkedBlockingQueue, SynchronousQueue, PriorityBlockingQueue。
+
+		threadFactory：创建线程的工程类。可以通过指定线程工厂为每个创建出来的线程设置更有意义的名字，如果出现并发问题，也方便查找问题原因。
+
+		handler：饱和策略。当线程池的阻塞队列已满和指定的线程都已经开启，说明当前线程池已经处于饱和状态了，那么就需要采用一种策略来处理这种情况。采用的策略有这几种：
+
+				1.AbortPolicy： 直接拒绝所提交的任务，并抛出RejectedExecutionException异常；
+
+				2.CallerRunsPolicy：只用调用者所在的线程来执行任务；
+
+				3.DiscardPolicy：不处理直接丢弃掉任务；
+
+				4.DiscardOldestPolicy：丢弃掉阻塞队列中存放时间最久的任务，执行当前任务
+
+
+
+四、execute方法执行逻辑有这样几种情况;
+
+	1.如果当前运行的线程少于 corePoolSize，则会创建新的线程来执行新的任务；
+
+	2.如果运行的线程个数等于或者大于 corePoolSize，则会将提交的任务存放到阻塞队列 workQueue 中；
+
+	3.如果当前 workQueue 队列已满的话，则会创建新的线程来执行任务；
+
+	4.如果线程个数已经超过了 maximumPoolSize，则会使用饱和策略RejectedExecutionHandler来进行处理
+
+五、线程池ThreadPoolExecutor的五种状态
+
+	1.Running,能接受新的任务，并且也能处理阻塞队列中的任务
+
+	2.shutDown,关闭状态，不能接受新提交的任务，但却可以继续处理阻塞队列中已保存的任务
+
+	3.stop,不能接受新任务，也不能处理队列中的任务，会中断正在处理任务的先成
+
+	4.tidying,所任有务已经终结，workerCount为0
+
+	5.terminated,在terminated方法执行完后进入该状态
