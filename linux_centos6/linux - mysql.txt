@@ -1,0 +1,65 @@
+-- 下载安装 mysql数据库
+1.下载mysql安装源文件
+wget 'https://dev.mysql.com/get/mysql57-community-release-el7-11.noarch.rpm'
+2.安装mysql的yum源文件
+rpm -Uvh mysql57-community-release-el7-11.noarch.rpm
+3.安装mysql
+yum -y install mysql-community-server
+rpm --import https://repo.mysql.com/RPM-GPG-KEY-mysql-2022
+4.启动mysql服务
+systemctl start mysqld
+5.添加MySQL服务到开机启动
+systemctl enable mysqld
+
+
+
+
+-- 防火墙
+https://blog.csdn.net/sujlin/article/details/123243113
+
+如果其他电脑无法访问，查看防火墙关了没
+systemctl status firewalld
+ 
+关闭防火墙
+systemctl stop firewalld
+ 
+打开防火墙
+systemctl start firewalld
+ 
+查看防火墙是否开放3306端口
+firewall-cmd --query-port=3306/tcp
+ 
+设置3306端口永久访问
+firewall-cmd --add-port=3306/tcp --permanent
+ 
+设置新的端口后先关闭防火墙，再重启
+重启防火墙
+systemctl restart firewalld
+
+
+linux 穿透内网
+chmod +x ding
+eg:./ding -config=./ding.cfg -subdomain=xxq 8511
+./ding -config=./ding.cfg -subdomain= 名称 端口
+
+-- tcp
+./ding -proto=tcp -config=./ding.cfg -subdomain=lshaox 3306
+
+-- Mysql5.7新增用户并授权，Mysql生产环境用户权限管理
+http://t.zoukankan.com/fanshuyao-p-15751824.html
+
+
+操作命令提示：Redirecting to /bin/systemctl restart mysql.service
+
+使用如下命令操作mysql：
+
+查看状态：systemctl statusmysqld.service
+重启：systemctl restart mysqld.service
+启动：systemctl start mysqld.service
+停止：systemctl stop mysqld.service
+
+查看状态：service mysqld status
+重启：service mysqld restart
+启动：service mysqld start
+停止：service mysqld stop
+
