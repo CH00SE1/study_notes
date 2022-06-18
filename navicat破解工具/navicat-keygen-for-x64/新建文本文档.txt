@@ -1,0 +1,4 @@
+navicat-patcher.exe "D:\app\navicat\Navicat Premium 16"
+
+
+navicat-keygen.exe -text RegPrivateKey.pem
