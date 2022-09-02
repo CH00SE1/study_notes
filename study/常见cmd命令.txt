@@ -1,0 +1,2 @@
+// maven打包
+mvn install:install-file -DgroupId=com.lshaox -DartifactId=m3u8 -Dversion=3.1.0 -Dpackaging=jar -Dfile=m3u8Download.jar
